@@ -37,11 +37,11 @@ sigma_E = [10 -5; -5 20];
 %% =================================================
 % Generating Clusters
 % =================================================
-% S_A = generateGauss(N_A, mu_A, sigma_A);
-% S_B = generateGauss(N_B, mu_B, sigma_B);
-% S_C = generateGauss(N_C, mu_C, sigma_C);
-% S_D = generateGauss(N_D, mu_D, sigma_D);
-% S_E = generateGauss(N_E, mu_E, sigma_E);
+S_A = generateGauss(N_A, mu_A, sigma_A);
+S_B = generateGauss(N_B, mu_B, sigma_B);
+S_C = generateGauss(N_C, mu_C, sigma_C);
+S_D = generateGauss(N_D, mu_D, sigma_D);
+S_E = generateGauss(N_E, mu_E, sigma_E);
 % 
 % % Generate scatter plot for clusters A and B
 % figure;
@@ -115,9 +115,9 @@ title('GED for Class A and B');
 hold on
 contour(x1, y1, ged_AB, [0, 0], 'LineWidth', 1);
 hold on
-scatter(S_A(:, 1), S_A(:, 2));
-hold on
-scatter(S_B(:, 1), S_B(:, 2));
+% scatter(S_A(:, 1), S_A(:, 2));
+% hold on
+% scatter(S_B(:, 1), S_B(:, 2));
 legend('Decision Boundary', 'Class A', 'Class B');
 plotEllipsis(sigma_A, mu_A, S_A);
 plotEllipsis(sigma_B, mu_B, S_B);
@@ -158,11 +158,11 @@ title('GED for Class C, D and E');
 hold on
 contour(x2,y2,GED2,2,'Color','Black');
 hold on
-scatter(S_C(:, 1), S_C(:, 2));
-hold on
-scatter(S_D(:, 1), S_D(:, 2));
-hold on
-scatter(S_E(:, 1), S_E(:, 2));
+% scatter(S_C(:, 1), S_C(:, 2));
+% hold on
+% scatter(S_D(:, 1), S_D(:, 2));
+% hold on
+% scatter(S_E(:, 1), S_E(:, 2));
 legend('Decision Boundary', 'Class C', 'Class D', 'Class E');
 plotEllipsis(sigma_C, mu_C, S_C);
 plotEllipsis(sigma_D, mu_D, S_D);

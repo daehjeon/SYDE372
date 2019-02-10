@@ -1,50 +1,78 @@
-function [db] = generateNN_db(S_1, S_2)
-%generateNN_db Generate the decision boundary using Nearest Neighbor
+function classification = generateNN_db(k, Sets)
+%generateNN_db Generate the decision boundary using Nearest Neighbor\
 
 % Define point range and resolution
-% x_lower = min(min(S_1(1, :)), min(S_2(1, :)));
-% x_higher = max(max(S_1(1, :)), max(S_2(1, :)));
-% y_lower = min(min(S_1(:, 1)), min(S_2(:, 1)));
-% y_higher = max(max(S_1(:, 1)), max(S_2(:, 1)));
+numOfSets = length(Sets);
+[x_lower, x_higher, y_lower, y_higher] = deal(0,0,0,0);
+for i = 1:numOfSets
+    [currentSet] = Sets{i};
+    if (min(currentSet(:, 1)) < x_lower)
+        x_lower = min(currentSet(:, 1));
+    end
+    if (max(currentSet(:, 1)) > x_higher)
+        x_higher = max(currentSet(:, 1));
+    end
+    if (min(currentSet(1, :)) < y_lower)
+        y_lower = min(currentSet(1, :));
+    end
+    if (max(currentSet(1, :)) > y_higher)
+        y_higher = max(currentSet(1, :));
+    end
+end
 
-% Temp settings for bounds, change to the lines above late
-x_lower = -5;
-x_higher = 20;
-y_lower = 0;
-y_higher = 20;
+resolution = 0.05; % Resolution for grid
+[gridX, gridY] = meshgrid(x_lower:resolution:x_higher, y_lower:resolution:y_higher);
 
-% TODO: maybe adjust these to improve the db
-resolution = 0.2;
-sensitivity = 0.01;
-tolerance = 0.6;
+classification = zeros(size(gridX, 1), size(gridY, 2));
 
-db = [];
-% This is gonna be a bitch to run, might need to optimize
-for x = x_lower:+resolution:x_higher
-    for y = y_lower:+resolution:y_higher
-        % Calculate the minimum distance between sample and S_1 points
-        d_1_min = 10e5; % random big number to compare to
-        for i = 1:size(S_1, 1)
-            point1 = S_1(i, :);
-            d_1_curr = (point1(:, 1) - x)^2 + (point1(:, 2) - y)^2;
-            if (d_1_curr < d_1_min)
-                d_1_min = d_1_curr;
-                temp_point = point1;
-            end
+for x = 1:size(gridX, 1)
+    for y = 1:size(gridX, 2)
+        setDistances = zeros(1, numOfSets);
+        samplePnt = [gridX(x, y) gridY(x, y)];
+        for i = 1:numOfSets
+            setDistances(:, i) = setDistance(k, samplePnt, Sets{i}); 
         end
+       
+        min_distance = min(setDistances);
         
-        % Calculate distance between sample and points in Set 2 (S_2), 
-        % Check if any points give the same min distance
-        for j = 1:size(S_2, 1)
-            point2 = S_2(j, :);
-            d_2_curr = (point2(:, 1) - x)^2 + (point2(:, 2) - y)^2;
-            % Store point in db if the difference is small enough
-            if (abs(d_2_curr - d_1_min) < sensitivity && d_1_min < tolerance)
-                db = [db; [x, y]];
+        for i = 1:numOfSets
+            if (min_distance == setDistances(:, i))
+                classification(x, y) = i;
             end
         end
     end
 end
 
+contour(gridX, gridY, classification);
+
+end
+
+% Calculate Euclidean distance
+function distance = getEuclideanDistance(p1, p2)
+    distance = sqrt((p2(:, 1) - p1(:, 1))^2 + (p2(:, 2) - p1(:, 2))^2);
+end
+
+function setDistance = setDistance(k, point, Set)
+    
+    if (k == 1)
+        % Nearest Neighbor
+        setDistance = 10e7; % random big number to compare to
+        for i = 1:size(Set, 1)
+            currentPoint = Set(i, :);
+            curent_distance = getEuclideanDistance(currentPoint, point);
+            if (curent_distance < setDistance)
+                setDistance = curent_distance;
+            end
+        end
+    elseif (k > 1)
+        % K-Nearest Neighbor
+        distances = zeros(size(Set(:, 1)));
+        for i = 1:size(Set, 1)
+            currentPoint = Set(i, :);
+            distances(i, :) = getEuclideanDistance(currentPoint, point);
+        end
+        distances = sort(distances);
+        setDistance = sum(distances(1:k, 1)) / k;
+    end
 end
 

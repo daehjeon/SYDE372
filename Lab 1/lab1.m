@@ -158,11 +158,6 @@ title('GED for Class C, D and E');
 hold on
 contour(x2,y2,GED2,2,'Color','Black');
 hold on
-% scatter(S_C(:, 1), S_C(:, 2));
-% hold on
-% scatter(S_D(:, 1), S_D(:, 2));
-% hold on
-% scatter(S_E(:, 1), S_E(:, 2));
 legend('Decision Boundary', 'Class C', 'Class D', 'Class E');
 plotEllipsis(sigma_C, mu_C, S_C);
 plotEllipsis(sigma_D, mu_D, S_D);
@@ -173,24 +168,26 @@ plotEllipsis(sigma_E, mu_E, S_E);
 
 
 %% NN (Nearest Neighbor)
-NN_db_ab = generateNN_db(S_B, S_A);
 figure;
-line(NN_db_ab(:, 1), NN_db_ab(:, 2), 'LineWidth', 2);
-hold on;
 scatter(S_A(:, 1), S_A(:, 2));
 hold on;
 scatter(S_B(:, 1), S_B(:, 2));
 hold on;
-plot(C_A(:, 1), C_A(:, 2), 'LineWidth', 3);
-hold on;
-plot(C_B(:, 1), C_B(:, 2), 'LineWidth', 3);
-hold on;
-generateMED_db(mu_true_A, mu_true_B, [-5, 20]);
+generateNN_db(1, {S_A, S_B});
 title("Nearest Neighbor Decision Boundary for Class A & B");
 
 %% KNN (K-Nearest Neighbor)
-
-
+figure;
+scatter(S_A(:, 1), S_A(:, 2));
+hold on;
+scatter(S_B(:, 1), S_B(:, 2));
+% hold on;
+% plot(C_A(:, 1), C_A(:, 2), 'LineWidth', 3);
+% hold on;
+% plot(C_B(:, 1), C_B(:, 2), 'LineWidth', 3);
+hold on;
+generateNN_db(5, {S_A, S_B});
+title("K-Nearest Neighbor (k = 5) Decision Boundary for Class A & B");
 
 %% ///////////// CASE 2 (class C, D, & E) //////////////
 mu_true_C = mean(S_C); % true mean
@@ -200,31 +197,53 @@ sigma_true_C = cov(S_C);
 sigma_true_D = cov(S_D);
 sigma_true_E = cov(S_E);
 
+%% 
 % MED (Minimum Euclidean Distance)
-% figure;
-% generateMED_db(mu_true_C, mu_true_D, [9.8, 10.2]);
-% hold on;
-% generateMED_db(mu_true_C, mu_true_E, [-5, 20]);
-% hold on;
-% generateMED_db(mu_true_D, mu_true_E, [-5, 20]);
-% hold on;
-% scatter(S_C(:, 1), S_C(:, 2));
-% hold on;
-% scatter(S_D(:, 1), S_D(:, 2));
-% hold on;
-% scatter(S_E(:, 1), S_E(:, 2));
-% hold on;
-% plot(C_C(:, 1), C_C(:, 2), 'LineWidth', 3);
-% hold on;
-% plot(C_D(:, 1), C_D(:, 2), 'LineWidth', 3);
-% hold on;
-% plot(C_E(:, 1), C_E(:, 2), 'LineWidth', 3);
-% title('MED Decision Boundary for Class C, D, and E');
+figure;
+generateMED_db(mu_true_C, mu_true_D, [9.8, 10.2]);
+hold on;
+generateMED_db(mu_true_C, mu_true_E, [-5, 20]);
+hold on;
+generateMED_db(mu_true_D, mu_true_E, [-5, 20]);
+hold on;
+scatter(S_C(:, 1), S_C(:, 2));
+hold on;
+scatter(S_D(:, 1), S_D(:, 2));
+hold on;
+scatter(S_E(:, 1), S_E(:, 2));
+hold on;
+plot(C_C(:, 1), C_C(:, 2), 'LineWidth', 3);
+hold on;
+plot(C_D(:, 1), C_D(:, 2), 'LineWidth', 3);
+hold on;
+plot(C_E(:, 1), C_E(:, 2), 'LineWidth', 3);
+title('MED Decision Boundary for Class C, D, and E');
+%% 
 
-% GED (Generalized Euclidean Distance) - TODO: Need to be normalized???
+% GED (Generalized Euclidean Distance)
 
 % MAP (Maximum A Posterioi)
 
+%% 
 % NN (Nearest Neighbor)
+figure;
+scatter(S_C(:, 1), S_C(:, 2));
+hold on;
+scatter(S_D(:, 1), S_D(:, 2));
+hold on;
+scatter(S_E(:, 1), S_E(:, 2));
+hold on;
+generateNN_db(1, {S_C, S_D, S_E});
+title("Nearest Neighbor Decision Boundary for Class C, D & E");
+%% 
 
 % KNN (K-Nearest Neighbor)
+figure;
+scatter(S_C(:, 1), S_C(:, 2));
+hold on;
+scatter(S_D(:, 1), S_D(:, 2));
+hold on;
+scatter(S_E(:, 1), S_E(:, 2));
+hold on;
+generateNN_db(5, {S_C, S_D, S_E});
+title("K-Nearest Neighbor (k = 5) Decision Boundary for Class C, D & E");

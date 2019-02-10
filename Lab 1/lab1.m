@@ -1,4 +1,9 @@
-% Clusters and Classifcation Boundaries
+% SYDE Lab 1 - Clusters and Classification Boundaries
+% Dae Jeon, ID 20377978
+% Zixuan Ren, ID 20566221
+% Charlotte Emily Bond, ID XXXXXXXX
+% Oscar Lo, ID XXXXXXXX
+
 
 %% =================================================
 % Class data

@@ -1,6 +1,6 @@
 % Clusters and Classifcation Boundaries
 
-% =================================================
+%% =================================================
 % Class data
 % =================================================
 
@@ -29,7 +29,7 @@ N_E = 150;
 mu_E = [10 5];
 sigma_E = [10 -5; -5 20];
 
-% =================================================
+%% =================================================
 % Generating Clusters
 % =================================================
 % S_A = generateGauss(N_A, mu_A, sigma_A);
@@ -73,7 +73,7 @@ sigma_E = [10 -5; -5 20];
 % plot(C_E(:, 1), C_E(:, 2), 'LineWidth', 3);
 % title('Plot for Classes C, D, and E (Case 2)');
 
-% =================================================
+%% =================================================
 % Classifiers
 % =================================================
 
@@ -96,18 +96,78 @@ sigma_true_B = cov(S_B);
 % plot(C_B(:, 1), C_B(:, 2), 'LineWidth', 3);
 % title('MED Decision Boundary for Class A and B');
 
-% GED (Generalized Euclidean Distance) - TODO: Need to be normalized???
-% [S_A_trans, mu_A_trans] = generateGED(sigma_A, mu_A, S_A);
-% C_A_ged = generateContour(mu_A_trans', eye(2)); % Using identity matrix (eye) to produce unit contour???
-% 
-% figure;
-% scatter(S_A_trans(:, 1), S_A_trans(:, 2));
-% hold on;
-% plot(C_A_ged(:, 1), C_A_ged(:, 2), 'LineWidth', 3);
+%% GED (Generalized Euclidean Distance)
+% Create Meshgrid for Classifiers 
+x = min([S_A(:,1); S_B(:,1)])-1:0.05:max([S_A(:,1);S_B(:,1)])+1;
+y = min([S_A(:,2);S_B(:,2)])-1:0.05:max([S_A(:,2);S_B(:,2)])+1;
+[x1, y1] = meshgrid(x, y);
 
-% MAP (Maximum A Posterioi)
+%Case A & B
+distanceAB = zeros(size(x1, 1), size(y1, 2));
+ged_AB = generateGED(sigma_A, mu_A, sigma_B, mu_B, x1, y1, distanceAB);
+figure
+title('GED for Class A and B');   
+hold on
+contour(x1, y1, ged_AB, [0, 0], 'LineWidth', 1);
+hold on
+scatter(S_A(:, 1), S_A(:, 2));
+hold on
+scatter(S_B(:, 1), S_B(:, 2));
+legend('Decision Boundary', 'Class A', 'Class B');
+plotEllipsis(sigma_A, mu_A, S_A);
+plotEllipsis(sigma_B, mu_B, S_B);
 
-% NN (Nearest Neighbor)
+
+x = min([S_C(:,1);S_D(:,1);S_E(:,1)])-1:0.05:max([S_C(:,1);S_D(:,1);S_E(:,1)])+1;
+y = min([S_C(:,2);S_D(:,2);S_E(:,2)])-1:0.05:max([S_C(:,2);S_D(:,2);S_E(:,2)])+1;
+[x2, y2] = meshgrid(x, y);
+
+%Case C, D, E
+GED_cd = generateGED(sigma_C, mu_C, sigma_D, mu_D, x2, y2, 0);
+GED_ec = generateGED(sigma_E, mu_E, sigma_C, mu_C, x2, y2, 0);
+GED_de = generateGED(sigma_D, mu_D, sigma_E, mu_E, x2, y2, 0);
+
+%Classifying classes
+GED2 = zeros(size(x2, 1), size(y2, 2));
+for i=1:size(x2, 1)
+    for j=1:size(y2, 2)
+        c = 1; d = 2; e = 3;
+        if (GED_cd(i,j) < 0 && GED_ec(i,j) > 0)
+            % If distance is less than 0 for cd and greater than 0 for ec, it is part of class C
+            GED2(i, j) = c;
+        elseif (GED_cd(i,j) > 0 && GED_de(i,j) < 0)
+            % If distance is greater than 0 for cd and greater than 0 for de, it is part of class D
+            GED2(i, j) = d;
+        elseif (GED_de(i,j) > 0 && GED_ec(i,j) < 0)
+            % If distance is greater than 0 for de and less than 0 for ec, it is part of class E
+            GED2(i, j) = e;
+        else
+            disp('something is wrong');
+        end
+    end
+end
+
+%Figure
+figure
+title('GED for Class C, D and E');  
+hold on
+contour(x2,y2,GED2,2,'Color','Black');
+hold on
+scatter(S_C(:, 1), S_C(:, 2));
+hold on
+scatter(S_D(:, 1), S_D(:, 2));
+hold on
+scatter(S_E(:, 1), S_E(:, 2));
+legend('Decision Boundary', 'Class C', 'Class D', 'Class E');
+plotEllipsis(sigma_C, mu_C, S_C);
+plotEllipsis(sigma_D, mu_D, S_D);
+plotEllipsis(sigma_E, mu_E, S_E);
+
+
+%% MAP (Maximum A Posterioi)
+
+
+%% NN (Nearest Neighbor)
 NN_db_ab = generateNN_db(S_B, S_A);
 figure;
 line(NN_db_ab(:, 1), NN_db_ab(:, 2), 'LineWidth', 2);
@@ -123,11 +183,11 @@ hold on;
 generateMED_db(mu_true_A, mu_true_B, [-5, 20]);
 title("Nearest Neighbor Decision Boundary for Class A & B");
 
-% KNN (K-Nearest Neighbor)
+%% KNN (K-Nearest Neighbor)
 
 
 
-% ///////////// CASE 2 (class C, D, & E) //////////////
+%% ///////////// CASE 2 (class C, D, & E) //////////////
 mu_true_C = mean(S_C); % true mean
 mu_true_D = mean(S_D);
 mu_true_E = mean(S_E);

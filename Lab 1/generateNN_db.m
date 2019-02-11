@@ -30,7 +30,7 @@ for x = 1:size(gridX, 1)
         setDistances = zeros(1, numOfSets);
         samplePnt = [gridX(x, y) gridY(x, y)];
         for i = 1:numOfSets
-            setDistances(:, i) = setDistance(k, samplePnt, Sets{i}); 
+            setDistances(:, i) = getSetDistance(k, samplePnt, Sets{i}); 
         end
        
         min_distance = min(setDistances);
@@ -52,7 +52,7 @@ function distance = getEuclideanDistance(p1, p2)
     distance = sqrt((p2(:, 1) - p1(:, 1))^2 + (p2(:, 2) - p1(:, 2))^2);
 end
 
-function setDistance = setDistance(k, point, Set)
+function setDistance = getSetDistance(k, point, Set)
     
     if (k == 1)
         % Nearest Neighbor

@@ -123,7 +123,35 @@ plotEllipsis(sigma_A, mu_A, S_A);
 plotEllipsis(sigma_B, mu_B, S_B);
 
 %% MAP (Maximum A Posterioi)
+x = min([S_A(:,1); S_B(:,1)])-1:0.05:max([S_A(:,1);S_B(:,1)])+1;
+y = min([S_A(:,2);S_B(:,2)])-1:0.05:max([S_A(:,2);S_B(:,2)])+1;
+[x1, y1] = meshgrid(x, y);
 
+P_A = length(S_A)/(length(S_A) + length(S_B));
+P_B = length(S_B)/(length(S_A) + length(S_B));
+
+map_AB_db = generate_MAP_db(mu_A, mu_B, sigma_A, sigma_B, P_A, P_B, x1, y1);
+map_AB = zeros(size(x1, 1), size(y1, 2));
+for i = 1:size(x1, 1)
+    for j = 1:size(y1, 2)
+        if (abs(map_AB_db(i, j)) <= 0.05)
+            map_AB(i, j) = 1;
+        end
+    end
+end
+
+figure;
+contour(x1, y1, map_AB);
+hold on;
+scatter(S_A(:, 1), S_A(:, 2));
+hold on;
+scatter(S_B(:, 1), S_B(:, 2));
+hold on;
+plot(C_A(:, 1), C_A(:, 2), 'LineWidth', 3);
+hold on;
+plot(C_B(:, 1), C_B(:, 2), 'LineWidth', 3);
+
+title('MAP Decision Boundary for Class A and B');
 
 %% NN (Nearest Neighbor)
 figure;
@@ -221,6 +249,46 @@ plotEllipsis(sigma_E, mu_E, S_E);
 %% 
 % MAP (Maximum A Posterioi)
 
+x = min([S_C(:,1);S_D(:,1);S_E(:,1)])-1:0.05:max([S_C(:,1);S_D(:,1);S_E(:,1)])+1;
+y = min([S_C(:,2);S_D(:,2);S_E(:,2)])-1:0.05:max([S_C(:,2);S_D(:,2);S_E(:,2)])+1;
+[x2, y2] = meshgrid(x, y);
+
+P_C = length(S_C)/(length(S_C) + length(S_D) + length(S_E));
+P_D = length(S_D)/(length(S_C) + length(S_D) + length(S_E));
+P_E = length(S_E)/(length(S_C) + length(S_D) + length(S_E));
+
+map_CD = generate_MAP_db(mu_C, mu_D, sigma_C, sigma_D, P_C, P_D, x2, y2);
+map_DE = generate_MAP_db(mu_D, mu_E, sigma_D, sigma_E, P_D, P_E, x2, y2);
+map_CE = generate_MAP_db(mu_E, mu_C, sigma_E, sigma_C, P_E, P_C, x2, y2);
+
+map_CDE = zeros(size(x2, 1), size(y2, 2));
+for i = 1:size(x2, 1)
+    for j = 1:size(y2, 2)
+        if (map_CD(i, j) >= 0 && map_DE(i, j) <= 0)
+            map_CDE(i, j) = 1;
+        elseif (map_DE(i, j) >= 0 && map_CE(i, j) <= 0)
+            map_CDE(i, j) = 2;
+        elseif (map_CE(i, j) >= 0 && map_CD(i, j) <= 0)
+            map_CDE(i, j) = 3;
+        end
+    end
+end
+
+figure;
+contour(x2, y2, map_CDE);
+hold on;
+scatter(S_C(:, 1), S_C(:, 2));
+hold on;
+scatter(S_D(:, 1), S_D(:, 2));
+hold on;
+scatter(S_E(:, 1), S_E(:, 2));
+hold on;
+plot(C_C(:, 1), C_C(:, 2), 'LineWidth', 3);
+hold on;
+plot(C_D(:, 1), C_D(:, 2), 'LineWidth', 3);
+hold on;
+plot(C_E(:, 1), C_E(:, 2), 'LineWidth', 3);
+title('MAP Decision Boundary for Class C, D, and E');
 
 %% 
 % NN (Nearest Neighbor)

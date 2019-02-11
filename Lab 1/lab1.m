@@ -101,11 +101,11 @@ sigma_true_B = cov(S_B);
 
 % MED (Minimum Euclidean Distance)
 MED_AB = generateMED_db(mu_A, mu_B, x1, y1);
-
+MED_AB_classified = point_classifier(2, {MED_AB}, x1, y1);
 figure;
 plotEllipsis(sigma_A, mu_A, S_A);
 plotEllipsis(sigma_B, mu_B, S_B);
-contour(x1, y1, MED_AB, [0, 0], 'LineWidth', 1);
+contour(x1, y1, MED_AB_classified, 'LineWidth', 1);
 hold on;
 title('MED Decision Boundary for Class A and B');
 
@@ -114,10 +114,11 @@ title('MED Decision Boundary for Class A and B');
 %Case A & B
 distanceAB = zeros(size(x1, 1), size(y1, 2));
 ged_AB = generateGED(sigma_A, mu_A, sigma_B, mu_B, x1, y1, distanceAB);
+ged_AB_classified = point_classifier(2, {ged_AB}, x1, y1);
 figure
 title('GED for Class A and B');   
 hold on
-contour(x1, y1, ged_AB, [0, 0], 'LineWidth', 1);
+contour(x1, y1, ged_AB_classified, 'LineWidth', 1);
 hold on
 % scatter(S_A(:, 1), S_A(:, 2));
 % hold on
@@ -131,18 +132,11 @@ plotEllipsis(sigma_B, mu_B, S_B);
 P_A = length(S_A)/(length(S_A) + length(S_B));
 P_B = length(S_B)/(length(S_A) + length(S_B));
 
-map_AB_db = generate_MAP_db(mu_A, mu_B, sigma_A, sigma_B, P_A, P_B, x1, y1);
-map_AB = zeros(size(x1, 1), size(y1, 2));
-for i = 1:size(x1, 1)
-    for j = 1:size(y1, 2)
-        if (abs(map_AB_db(i, j)) <= 0.05)
-            map_AB(i, j) = 1;
-        end
-    end
-end
+map_AB = generate_MAP_db(mu_A, mu_B, sigma_A, sigma_B, P_A, P_B, x1, y1);
+map_AB_classified = point_classifier(2, {map_AB}, x1, y1);
 
 figure;
-contour(x1, y1, map_AB);
+contour(x1, y1, map_AB_classified);
 hold on;
 scatter(S_A(:, 1), S_A(:, 2));
 hold on;
@@ -191,12 +185,7 @@ MED_DE = generateMED_db(mu_D, mu_E, x2, y2);
 MED_EC = generateMED_db(mu_E, mu_C, x2, y2);
 
 % All classes
-MED_CDE = zeros(size(x2, 1), size(y2, 2));
-for i=1:size(x2, 1)
-    for j=1:size(y2, 2)
-        MED_CDE(i, j) = point_classifier(MED_CD(i, j), MED_DE(i, j), MED_EC(i, j));
-    end
-end
+MED_CDE = point_classifier(3, {MED_CD, MED_DE, MED_EC}, x2, y2);
 
 figure;
 contour(x2, y2, MED_CDE, 'Color','Black');
@@ -215,18 +204,13 @@ GED_ec = generateGED(sigma_E, mu_E, sigma_C, mu_C, x2, y2, 0);
 GED_de = generateGED(sigma_D, mu_D, sigma_E, mu_E, x2, y2, 0);
 
 %Classifying classes
-GED_CDE = zeros(size(x2, 1), size(y2, 2));
-for i=1:size(x2, 1)
-    for j=1:size(y2, 2)
-        GED_CDE(i, j) = point_classifier(GED_cd(i, j), GED_de(i, j), GED_ec(i, j));
-    end
-end
+GED_CDE_classified = point_classifier(3, {GED_cd, GED_de, GED_ec}, x2, y2);
 
 %Figure
 figure
 title('GED for Class C, D and E');  
 hold on
-contour(x2,y2,GED_CDE,2,'Color','Black');
+contour(x2,y2,GED_CDE_classified,2,'Color','Black');
 hold on
 legend('Decision Boundary', 'Class C', 'Class D', 'Class E');
 plotEllipsis(sigma_C, mu_C, S_C);
@@ -248,21 +232,10 @@ map_CD = generate_MAP_db(mu_C, mu_D, sigma_C, sigma_D, P_C, P_D, x2, y2);
 map_DE = generate_MAP_db(mu_D, mu_E, sigma_D, sigma_E, P_D, P_E, x2, y2);
 map_CE = generate_MAP_db(mu_E, mu_C, sigma_E, sigma_C, P_E, P_C, x2, y2);
 
-map_CDE = zeros(size(x2, 1), size(y2, 2));
-for i = 1:size(x2, 1)
-    for j = 1:size(y2, 2)
-        if (map_CD(i, j) >= 0 && map_DE(i, j) <= 0)
-            map_CDE(i, j) = d;
-        elseif (map_DE(i, j) >= 0 && map_CE(i, j) <= 0)
-            map_CDE(i, j) = e;
-        elseif (map_CE(i, j) >= 0 && map_CD(i, j) <= 0)
-            map_CDE(i, j) = c;
-        end
-    end
-end
+map_CDE_classified = point_classifier(3, {map_CD, map_DE, map_CE}, x2, y2);
 
 figure;
-contour(x2, y2, map_CDE);
+contour(x2, y2, map_CDE_classified, 'LineColor', 'b');
 hold on;
 scatter(S_C(:, 1), S_C(:, 2));
 hold on;
@@ -329,3 +302,11 @@ MED_confusionMatrix_CDE = [c_as_c, c_as_d, c_as_e, d_as_c, d_as_d, d_as_e, e_as_
 % = # of wrongly classified samples / the total # of samples.
 P_Error_Med_2 = (a_as_b + b_as_a)/(N_A + N_B);
 P_Error_Med_3 = (c_as_d + c_as_e + d_as_c + d_as_e + e_as_c + e_as_d)/(N_C + N_D + N_E);
+
+%% GED error analysis
+
+GED_confusion_mtx_AB = confusion_matrix(2, {S_A, S_B}, {mu_A, mu_B}, {sigma_A, sigma_B}, 'GED');
+P_Error_Ged_2 = (N_A + N_B - sum(diag(GED_confusion_mtx_AB)))/(N_A + N_B);
+
+GED_confusion_mtx_CDE = confusion_matrix(3, {S_C, S_D, S_E}, {mu_C, mu_D, mu_E}, {sigma_C, sigma_D, sigma_E}, 'GED');
+P_Error_Ged_3 = (N_C + N_D + N_E - sum(diag(GED_confusion_mtx_CDE)))/(N_C + N_D + N_E);

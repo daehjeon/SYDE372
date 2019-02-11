@@ -42,6 +42,17 @@ S_B = generateGauss(N_B, mu_B, sigma_B);
 S_C = generateGauss(N_C, mu_C, sigma_C);
 S_D = generateGauss(N_D, mu_D, sigma_D);
 S_E = generateGauss(N_E, mu_E, sigma_E);
+
+% Create Meshgrid for Classifiers 
+x = min([S_A(:,1); S_B(:,1)])-1:0.05:max([S_A(:,1);S_B(:,1)])+1;
+y = min([S_A(:,2);S_B(:,2)])-1:0.05:max([S_A(:,2);S_B(:,2)])+1;
+[x1, y1] = meshgrid(x, y);
+
+
+x = min([S_C(:,1);S_D(:,1);S_E(:,1)])-1:0.05:max([S_C(:,1);S_D(:,1);S_E(:,1)])+1;
+y = min([S_C(:,2);S_D(:,2);S_E(:,2)])-1:0.05:max([S_C(:,2);S_D(:,2);S_E(:,2)])+1;
+[x2, y2] = meshgrid(x, y);
+
 % 
 % % Generate scatter plot for clusters A and B
 figure;
@@ -99,10 +110,6 @@ hold on;
 title('MED Decision Boundary for Class A and B');
 
 %% GED (Generalized Euclidean Distance)
-% Create Meshgrid for Classifiers 
-x = min([S_A(:,1); S_B(:,1)])-1:0.05:max([S_A(:,1);S_B(:,1)])+1;
-y = min([S_A(:,2);S_B(:,2)])-1:0.05:max([S_A(:,2);S_B(:,2)])+1;
-[x1, y1] = meshgrid(x, y);
 
 %Case A & B
 distanceAB = zeros(size(x1, 1), size(y1, 2));
@@ -120,9 +127,6 @@ plotEllipsis(sigma_A, mu_A, S_A);
 plotEllipsis(sigma_B, mu_B, S_B);
 
 %% MAP (Maximum A Posterioi)
-x = min([S_A(:,1); S_B(:,1)])-1:0.05:max([S_A(:,1);S_B(:,1)])+1;
-y = min([S_A(:,2);S_B(:,2)])-1:0.05:max([S_A(:,2);S_B(:,2)])+1;
-[x1, y1] = meshgrid(x, y);
 
 P_A = length(S_A)/(length(S_A) + length(S_B));
 P_B = length(S_B)/(length(S_A) + length(S_B));
@@ -206,31 +210,15 @@ title('MED Decision Boundary for Class C, D and E');
 %% 
 % GED (Generalized Euclidean Distance)
 
-x = min([S_C(:,1);S_D(:,1);S_E(:,1)])-1:0.05:max([S_C(:,1);S_D(:,1);S_E(:,1)])+1;
-y = min([S_C(:,2);S_D(:,2);S_E(:,2)])-1:0.05:max([S_C(:,2);S_D(:,2);S_E(:,2)])+1;
-[x2, y2] = meshgrid(x, y);
-
 GED_cd = generateGED(sigma_C, mu_C, sigma_D, mu_D, x2, y2, 0);
 GED_ec = generateGED(sigma_E, mu_E, sigma_C, mu_C, x2, y2, 0);
 GED_de = generateGED(sigma_D, mu_D, sigma_E, mu_E, x2, y2, 0);
 
 %Classifying classes
-GED2 = zeros(size(x2, 1), size(y2, 2));
+GED_CDE = zeros(size(x2, 1), size(y2, 2));
 for i=1:size(x2, 1)
     for j=1:size(y2, 2)
-        c = 1; d = 2; e = 3;
-        if (GED_cd(i,j) < 0 && GED_ec(i,j) > 0)
-            % If distance is less than 0 for cd and greater than 0 for ec, it is part of class C
-            GED2(i, j) = c;
-        elseif (GED_cd(i,j) > 0 && GED_de(i,j) < 0)
-            % If distance is greater than 0 for cd and greater than 0 for de, it is part of class D
-            GED2(i, j) = d;
-        elseif (GED_de(i,j) > 0 && GED_ec(i,j) < 0)
-            % If distance is greater than 0 for de and less than 0 for ec, it is part of class E
-            GED2(i, j) = e;
-        else
-            disp('something is wrong');
-        end
+        GED_CDE(i, j) = point_classifier(GED_cd(i, j), GED_de(i, j), GED_ec(i, j));
     end
 end
 
@@ -238,7 +226,7 @@ end
 figure
 title('GED for Class C, D and E');  
 hold on
-contour(x2,y2,GED2,2,'Color','Black');
+contour(x2,y2,GED_CDE,2,'Color','Black');
 hold on
 legend('Decision Boundary', 'Class C', 'Class D', 'Class E');
 plotEllipsis(sigma_C, mu_C, S_C);

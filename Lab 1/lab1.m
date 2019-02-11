@@ -89,16 +89,13 @@ sigma_true_A = cov(S_A);
 sigma_true_B = cov(S_B);
 
 % MED (Minimum Euclidean Distance)
+MED_AB = generateMED_db(mu_A, mu_B, x1, y1);
+
 figure;
-generateMED_db(mu_true_A, mu_true_B, [-5, 20]);
+plotEllipsis(sigma_A, mu_A, S_A);
+plotEllipsis(sigma_B, mu_B, S_B);
+contour(x1, y1, MED_AB, [0, 0], 'LineWidth', 1);
 hold on;
-scatter(S_A(:, 1), S_A(:, 2));
-hold on;
-scatter(S_B(:, 1), S_B(:, 2));
-hold on;
-plot(C_A(:, 1), C_A(:, 2), 'LineWidth', 3);
-hold on;
-plot(C_B(:, 1), C_B(:, 2), 'LineWidth', 3);
 title('MED Decision Boundary for Class A and B');
 
 %% GED (Generalized Euclidean Distance)
@@ -185,25 +182,27 @@ sigma_true_E = cov(S_E);
 
 %% 
 % MED (Minimum Euclidean Distance)
+MED_CD = generateMED_db(mu_C, mu_D, x2, y2);
+MED_DE = generateMED_db(mu_D, mu_E, x2, y2);
+MED_EC = generateMED_db(mu_E, mu_C, x2, y2);
+
+% All classes
+MED_CDE = zeros(size(x2, 1), size(y2, 2));
+for i=1:size(x2, 1)
+    for j=1:size(y2, 2)
+        MED_CDE(i, j) = point_classifier(MED_CD(i, j), MED_DE(i, j), MED_EC(i, j));
+    end
+end
+
 figure;
-generateMED_db(mu_true_C, mu_true_D, [9.8, 10.2]);
+contour(x2, y2, MED_CDE, 'Color','Black');
 hold on;
-generateMED_db(mu_true_C, mu_true_E, [-5, 20]);
-hold on;
-generateMED_db(mu_true_D, mu_true_E, [-5, 20]);
-hold on;
-scatter(S_C(:, 1), S_C(:, 2));
-hold on;
-scatter(S_D(:, 1), S_D(:, 2));
-hold on;
-scatter(S_E(:, 1), S_E(:, 2));
-hold on;
-plot(C_C(:, 1), C_C(:, 2), 'LineWidth', 3);
-hold on;
-plot(C_D(:, 1), C_D(:, 2), 'LineWidth', 3);
-hold on;
-plot(C_E(:, 1), C_E(:, 2), 'LineWidth', 3);
-title('MED Decision Boundary for Class C, D, and E');
+
+plotEllipsis(sigma_C, mu_C, S_C);
+plotEllipsis(sigma_D, mu_D, S_D);
+plotEllipsis(sigma_E, mu_E, S_E);
+
+title('MED Decision Boundary for Class C, D and E');
 %% 
 % GED (Generalized Euclidean Distance)
 
@@ -265,11 +264,11 @@ map_CDE = zeros(size(x2, 1), size(y2, 2));
 for i = 1:size(x2, 1)
     for j = 1:size(y2, 2)
         if (map_CD(i, j) >= 0 && map_DE(i, j) <= 0)
-            map_CDE(i, j) = 1;
+            map_CDE(i, j) = d;
         elseif (map_DE(i, j) >= 0 && map_CE(i, j) <= 0)
-            map_CDE(i, j) = 2;
+            map_CDE(i, j) = e;
         elseif (map_CE(i, j) >= 0 && map_CD(i, j) <= 0)
-            map_CDE(i, j) = 3;
+            map_CDE(i, j) = c;
         end
     end
 end

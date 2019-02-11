@@ -40,7 +40,7 @@ theta = atan2(maxEigenVec(2), maxEigenVec(1));
 np = 100;
 ang = [0:np]*2*pi/np;
 pts = [mean(1);mean(2)]*ones(size(ang)) + [cos(theta) -sin(theta); sin(theta) cos(theta)]*[cos(ang)*sqrt(maxEigenVal); sin(ang)*sqrt(minEigenVal)];
-plot( pts(1,:), pts(2,:) );
+plot( pts(1,:), pts(2,:), 'LineWidth', 3 );
 hold on
 scatter(cluster(:, 1), cluster(:, 2));
 

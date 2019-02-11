@@ -245,3 +245,32 @@ scatter(S_E(:, 1), S_E(:, 2));
 hold on;
 generateNN_db(5, {S_C, S_D, S_E});
 title("K-Nearest Neighbor (k = 5) Decision Boundary for Class C, D & E");
+
+
+%% Error Analysis
+
+% Confusion matrix of the form:
+% Predicted:         A          B                      C          D         E
+% Actual:      A [ a_as_a    a_as_b     ]        C [ c_as_c    c_as_d    c_as_e ]
+%              B [ b_as_a    b_as_b     ]        D [ d_as_c    d_as_d    d_as_e ]
+%                                                E [ e_as_c    e_as_d    e_as_e ]
+
+%% MED error analysis
+
+%Confusion matrix for AB
+[a_as_a, a_as_b, notinuse] = MED_confusion_matrix(S_A, mu_A, mu_B, 0);
+[b_as_a, b_as_b, notinuse] = MED_confusion_matrix(S_B, mu_A, mu_B, 0);
+
+MED_confusionMatrix_AB = [a_as_a, a_as_b, b_as_a, b_as_b];
+
+%Confusion matrix for CDE
+[c_as_c, c_as_d, c_as_e] = MED_confusion_matrix(S_C, mu_C, mu_D, mu_E);
+[d_as_c, d_as_d, d_as_e] = MED_confusion_matrix(S_D, mu_C, mu_D, mu_E);
+[e_as_c, e_as_d, e_as_e] = MED_confusion_matrix(S_E, mu_C, mu_D, mu_E);
+
+MED_confusionMatrix_CDE = [c_as_c, c_as_d, c_as_e, d_as_c, d_as_d, d_as_e, e_as_c, e_as_d, e_as_e];
+ 
+%experimental error
+% = # of wrongly classified samples / the total # of samples.
+P_Error_Med_2 = (a_as_b + b_as_a)/(N_A + N_B);
+P_Error_Med_3 = (c_as_d + c_as_e + d_as_c + d_as_e + e_as_c + e_as_d)/(N_C + N_D + N_E);

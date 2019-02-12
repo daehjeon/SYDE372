@@ -33,9 +33,9 @@ elseif (size == 3)
         mtx = [c_as_c, c_as_d, c_as_e; d_as_c, d_as_d, d_as_e; e_as_c, e_as_d, e_as_e];
         
     elseif (method == 'MAP')
-        [c_as_c, c_as_d, c_as_e] = getMAPConfusionMtx2(sample_C, sample_D, sample_E, means{1}, means{2}, means{3}, sample_C);
-        [d_as_c, d_as_d, d_as_e] = getMAPConfusionMtx2(sample_C, sample_D, sample_E, means{1}, means{2}, means{3}, sample_D);
-        [e_as_c, e_as_d, e_as_e] = getMAPConfusionMtx2(sample_C, sample_D, sample_E, means{1}, means{2}, means{3}, sample_E);
+        [c_as_c, c_as_d, c_as_e] = getMAPConfusionMtx2(true_stat, means, covariance, sample_C);
+        [d_as_c, d_as_d, d_as_e] = getMAPConfusionMtx2(true_stat, means, covariance, sample_D);
+        [e_as_c, e_as_d, e_as_e] = getMAPConfusionMtx2(true_stat, means, covariance, sample_E);
         mtx = [c_as_c, c_as_d, c_as_e; d_as_c, d_as_d, d_as_e; e_as_c, e_as_d, e_as_e];
         
     elseif (method == '1NN')
@@ -169,36 +169,48 @@ function confusionMtx = getMAPConfusionMtx(means, covariance, true_stat)
     confusionMtx = [a_as_a, a_as_b; b_as_a, b_as_b];
 end
 
-function [counter_c, counter_d, counter_e, unclassified] = getMAPConfusionMtx2(Sc, Sd, Se, Mc, Md, Me, X)   
+function [counter_c, counter_d, counter_e, unclassified] = getMAPConfusionMtx2(samples, means, cov, X)   
     % X is the class we are trying to classify
     counter_c = 0;
     counter_d = 0;
     counter_e = 0;
     unclassified = 0;  % if there are any exceptions
     
+    Sc = samples{1};
+    Sd = samples{2};
+    Se = samples{3};
+    
+    covC = cov{1};
+    covD = cov{2};
+    covE = cov{3};
+    
+    Mc = means{1};
+    Md = means{2};
+    Me = means{3};
+    
     Pc = length(Sc)/(length(Sc) + length(Sd) + length(Se));
     Pd = length(Sd)/(length(Sc) + length(Sd) + length(Se));
     Pe = length(Se)/(length(Sc) + length(Sd) + length(Se));
     
     %check distance between c and d
-    rows = size(X, 1);
+    rows = length(X);
     for i=1:rows
         xBar = X(i,:);
-        Q0 = inv(Sc) - inv(Sd);
-        Q1 = 2*(Md*inv(Sd)-Mc*inv(Sc));
-        Q2 = Mc*inv(Sc)*Mc' - Md*inv(Sd)*Md';
+        Q0 = inv(covC) - inv(covD);
+        Q1 = 2*(Md*inv(covD)-Mc*inv(covC));
+        Q2 = Mc*inv(covC)*Mc' - Md*inv(covD)*Md';
         Q3 = log(Pd/Pc);
-        Q4 = log(det(Sc)/det(Sd));
+        Q4 = log(det(covC)/det(covD));
         distance_1 = xBar*Q0*xBar' + Q1*xBar'+Q2+2*Q3+Q4; 
 
         %Classified as class c
         if distance_1 <= 0
             %now compare with class C and E
-            Q0 = inv(Sc) - inv(Se);
-            Q1 = 2*(Me*inv(Se) - Mc*inv(Sc));
-            Q2 = Mc*inv(Sc)*Mc' - Me*inv(Se)*Me';
+            Q0 = inv(covC) - inv(covE);
+            Q1 = 2*(Me*inv(covE) - Mc*inv(covC));
+            Q2 = Mc*inv(covC)*Mc' - Me*inv(covE)*Me';
             Q3 = log(Pe/Pc);
-            Q4 = log(det(Sc)/det(Se));
+            Q4 = log(det(covC)/det(covE));
             distance_2 = xBar*Q0*xBar' + Q1*xBar'+Q2+2*Q3+Q4;
 
             if distance_2 <= 0 
@@ -212,11 +224,11 @@ function [counter_c, counter_d, counter_e, unclassified] = getMAPConfusionMtx2(S
 
         else
             %Is not classifed as class c
-            Q0 = inv(Sd) - inv(Se);
-            Q1 = 2*(Me*inv(Se) -Md*inv(Sd));
-            Q2 = Md*inv(Sd)*Md' - Me*inv(Se)*Me';
+            Q0 = inv(covD) - inv(covE);
+            Q1 = 2*(Me*inv(covE) -Md*inv(covD));
+            Q2 = Md*inv(covD)*Md' - Me*inv(covE)*Me';
             Q3 = log(Pe/Pd);
-            Q4 = log(det(Sd)/det(Se));
+            Q4 = log(det(covD)/det(covE));
             
             %check if the point is classified as class D or E
             distance_3 = xBar*Q0*xBar' + Q1*xBar'+Q2+2*Q3+Q4;

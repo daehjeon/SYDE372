@@ -289,14 +289,14 @@ title("K-Nearest Neighbor (k = 5) Decision Boundary for Class C, D & E");
 [a_as_a, a_as_b, notinuse] = MED_confusion_matrix(S_A, mu_A, mu_B, 0);
 [b_as_a, b_as_b, notinuse] = MED_confusion_matrix(S_B, mu_A, mu_B, 0);
 
-MED_confusionMatrix_AB = [a_as_a, a_as_b, b_as_a, b_as_b];
+MED_confusionMatrix_AB = [a_as_a, a_as_b; b_as_a, b_as_b];
 
 %Confusion matrix for CDE
 [c_as_c, c_as_d, c_as_e] = MED_confusion_matrix(S_C, mu_C, mu_D, mu_E);
 [d_as_c, d_as_d, d_as_e] = MED_confusion_matrix(S_D, mu_C, mu_D, mu_E);
 [e_as_c, e_as_d, e_as_e] = MED_confusion_matrix(S_E, mu_C, mu_D, mu_E);
 
-MED_confusionMatrix_CDE = [c_as_c, c_as_d, c_as_e, d_as_c, d_as_d, d_as_e, e_as_c, e_as_d, e_as_e];
+MED_confusionMatrix_CDE = [c_as_c, c_as_d, c_as_e; d_as_c, d_as_d, d_as_e; e_as_c, e_as_d, e_as_e];
  
 %experimental error
 % = # of wrongly classified samples / the total # of samples.
@@ -310,3 +310,22 @@ P_Error_Ged_2 = (N_A + N_B - sum(diag(GED_confusion_mtx_AB)))/(N_A + N_B);
 
 GED_confusion_mtx_CDE = confusion_matrix(3, {S_C, S_D, S_E}, {mu_C, mu_D, mu_E}, {sigma_C, sigma_D, sigma_E}, 'GED');
 P_Error_Ged_3 = (N_C + N_D + N_E - sum(diag(GED_confusion_mtx_CDE)))/(N_C + N_D + N_E);
+
+
+%% MAP error analysis
+
+MAP_confusion_mtx_AB = confusion_matrix(2, {S_A, S_B}, {mu_A, mu_B}, {sigma_A, sigma_B}, 'MAP');
+
+%% NN/KNN error analysis
+
+NN_confusion_mtx_AB = confusion_matrix(2, {S_A, S_B}, {mu_A, mu_B}, {sigma_A, sigma_B}, '1NN');
+P_Error_NN_2 = (N_A + N_B - sum(diag(NN_confusion_mtx_AB)))/(N_A + N_B);
+
+NN_confusion_mtx_CDE = confusion_matrix(3, {S_C, S_D, S_E}, {mu_C, mu_D, mu_E}, {sigma_C, sigma_D, sigma_E}, '1NN');
+P_Error_Ged_3 = (N_C + N_D + N_E - sum(diag(NN_confusion_mtx_CDE)))/(N_C + N_D + N_E);
+
+KNN_confusion_mtx_AB = confusion_matrix(2, {S_A, S_B}, {mu_A, mu_B}, {sigma_A, sigma_B}, 'KNN');
+P_Error_KNN_2 = (N_A + N_B - sum(diag(KNN_confusion_mtx_AB)))/(N_A + N_B);
+
+KNN_confusion_mtx_CDE = confusion_matrix(3, {S_C, S_D, S_E}, {mu_C, mu_D, mu_E}, {sigma_C, sigma_D, sigma_E}, 'KNN');
+P_Error_KNN_3 = (N_C + N_D + N_E - sum(diag(KNN_confusion_mtx_CDE)))/(N_C + N_D + N_E);

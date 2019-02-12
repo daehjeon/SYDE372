@@ -1,23 +1,58 @@
 function mtx = confusion_matrix(size, true_stat, means, covariance, method)
 %confusion_matrix Returns the confusion matrix from the results given
 
+global ...
+N_A mu_A sigma_A ...
+N_B mu_B sigma_B ...
+N_C mu_C sigma_C ...
+N_D mu_D sigma_D ...
+N_E mu_E sigma_E;
+
+% Class A
+N_A = 200;
+mu_A = [5 10];
+sigma_A = [8 0; 0 4];
+
+% Class B
+N_B = 200;
+mu_B = [10 15];
+sigma_B = [8 0; 0 4];
+
+% Class C
+N_C = 100;
+mu_C = [5 10];
+sigma_C = [8 4; 4 40];
+
+% Class D
+N_D = 200;
+mu_D = [15 10];
+sigma_D = [8 0; 0 8];
+
+% Class E
+N_E = 150;
+mu_E = [10 5];
+sigma_E = [10 -5; -5 20];
+
 if (size == 2) 
     sample_A = true_stat{1};
     sample_B = true_stat{2};
+    
+    testSampleA = generateGauss(N_A, mu_A, sigma_A);
+    testSampleB = generateGauss(N_B, mu_B, sigma_B);
     
     if (method == 'GED')
         [a_as_a, a_as_b, tmp] = getGEDConfusionMtx(means, covariance, sample_A, 2);
         [b_as_a, b_as_b, tmp] = getGEDConfusionMtx(means, covariance, sample_B, 2);
         mtx = [a_as_a, a_as_b; b_as_a, b_as_b];
     elseif (method == '1NN')
-        [a_as_a, a_as_b, tmp] = getNNConfusionMtx(1, 1, {sample_A, sample_B}, 2);
-        [b_as_a, b_as_b, tmp] = getNNConfusionMtx(1, 2, {sample_A, sample_B}, 2);
+        [a_as_a, a_as_b, tmp] = getNNConfusionMtx(1, 1, {sample_A, sample_B}, testSampleA, 2);
+        [b_as_a, b_as_b, tmp] = getNNConfusionMtx(1, 2, {sample_A, sample_B}, testSampleB, 2);
         mtx = [a_as_a, a_as_b; b_as_a, b_as_b];
     elseif (method == 'MAP')
         mtx = getMAPConfusionMtx(means, covariance, true_stat);
     elseif (method == 'KNN')
-        [a_as_a, a_as_b, tmp] = getNNConfusionMtx(5, 1, {sample_A, sample_B}, 2);
-        [b_as_a, b_as_b, tmp] = getNNConfusionMtx(5, 2, {sample_A, sample_B}, 2);
+        [a_as_a, a_as_b, tmp] = getNNConfusionMtx(5, 1, {sample_A, sample_B}, testSampleA, 2);
+        [b_as_a, b_as_b, tmp] = getNNConfusionMtx(5, 2, {sample_A, sample_B}, testSampleB, 2);
         mtx = [a_as_a, a_as_b; b_as_a, b_as_b];
     end
     
@@ -25,6 +60,10 @@ elseif (size == 3)
     sample_C = true_stat{1};
     sample_D = true_stat{2};
     sample_E = true_stat{3};
+    
+    testSampleC = generateGauss(N_C, mu_C, sigma_C);
+    testSampleD = generateGauss(N_D, mu_D, sigma_D);
+    testSampleE = generateGauss(N_E, mu_E, sigma_E);
 
     if (method == 'GED')
         [c_as_c, c_as_d, c_as_e] = getGEDConfusionMtx(means, covariance, sample_C, 3);
@@ -39,15 +78,15 @@ elseif (size == 3)
         mtx = [c_as_c, c_as_d, c_as_e; d_as_c, d_as_d, d_as_e; e_as_c, e_as_d, e_as_e];
         
     elseif (method == '1NN')
-        [c_as_c, c_as_d, c_as_e] = getNNConfusionMtx(1, 1, {sample_C, sample_D, sample_E}, 3);
-        [d_as_c, d_as_d, d_as_e] = getNNConfusionMtx(1, 2, {sample_C, sample_D, sample_E}, 3);
-        [e_as_c, e_as_d, e_as_e] = getNNConfusionMtx(1, 3, {sample_C, sample_D, sample_E}, 3);
+        [c_as_c, c_as_d, c_as_e] = getNNConfusionMtx(1, 1, {sample_C, sample_D, sample_E}, testSampleC, 3);
+        [d_as_c, d_as_d, d_as_e] = getNNConfusionMtx(1, 2, {sample_C, sample_D, sample_E}, testSampleD, 3);
+        [e_as_c, e_as_d, e_as_e] = getNNConfusionMtx(1, 3, {sample_C, sample_D, sample_E}, testSampleE, 3);
         mtx = [c_as_c, c_as_d, c_as_e; d_as_c, d_as_d, d_as_e; e_as_c, e_as_d, e_as_e];
 
     elseif (method == 'KNN')
-        [c_as_c, c_as_d, c_as_e] = getNNConfusionMtx(5, 1, {sample_C, sample_D, sample_E}, 3);
-        [d_as_c, d_as_d, d_as_e] = getNNConfusionMtx(5, 2, {sample_C, sample_D, sample_E}, 3);
-        [e_as_c, e_as_d, e_as_e] = getNNConfusionMtx(5, 3, {sample_C, sample_D, sample_E}, 3);
+        [c_as_c, c_as_d, c_as_e] = getNNConfusionMtx(5, 1, {sample_C, sample_D, sample_E}, testSampleC, 3);
+        [d_as_c, d_as_d, d_as_e] = getNNConfusionMtx(5, 2, {sample_C, sample_D, sample_E}, testSampleD, 3);
+        [e_as_c, e_as_d, e_as_e] = getNNConfusionMtx(5, 3, {sample_C, sample_D, sample_E}, testSampleE, 3);
         mtx = [c_as_c, c_as_d, c_as_e; d_as_c, d_as_d, d_as_e; e_as_c, e_as_d, e_as_e];
 end
 end
@@ -91,8 +130,7 @@ function [count1, count2, count3] = getGEDConfusionMtx(means, cov, sample, caseN
     
 end
 
-function [count1, count2, count3] = getNNConfusionMtx(k, classNum, samples, caseNum)
-    testSample = samples{classNum};
+function [count1, count2, count3] = getNNConfusionMtx(k, classNum, samples, testSample, caseNum)
     count1 = 0;
     count2 = 0;
     count3 = 0;
@@ -131,7 +169,7 @@ function setDistance = getSetDistance(k, point, Set)
     if (k == 1)
         % Nearest Neighbor
         setDistance = 10e7; % random big number to compare to
-        for i = 1:size(Set, 1)
+        for i = 1:length(Set)
             currentPoint = Set(i, :);
             curent_distance = getEuclideanDistance(currentPoint, point);
             if (curent_distance < setDistance)
@@ -140,8 +178,8 @@ function setDistance = getSetDistance(k, point, Set)
         end
     elseif (k > 1)
         % K-Nearest Neighbor
-        distances = zeros(size(Set(:, 1)));
-        for i = 1:size(Set, 1)
+        distances = zeros(length(Set));
+        for i = 1:length(Set)
             currentPoint = Set(i, :);
             distances(i, :) = getEuclideanDistance(currentPoint, point);
         end

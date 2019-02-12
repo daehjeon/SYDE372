@@ -324,7 +324,7 @@ NN_confusion_mtx_AB = confusion_matrix(2, {S_A, S_B}, {mu_A, mu_B}, {sigma_A, si
 P_Error_NN_2 = (N_A + N_B - sum(diag(NN_confusion_mtx_AB)))/(N_A + N_B);
 
 NN_confusion_mtx_CDE = confusion_matrix(3, {S_C, S_D, S_E}, {mu_C, mu_D, mu_E}, {sigma_C, sigma_D, sigma_E}, '1NN');
-P_Error_Ged_3 = (N_C + N_D + N_E - sum(diag(NN_confusion_mtx_CDE)))/(N_C + N_D + N_E);
+P_Error_NN_3 = (N_C + N_D + N_E - sum(diag(NN_confusion_mtx_CDE)))/(N_C + N_D + N_E);
 
 KNN_confusion_mtx_AB = confusion_matrix(2, {S_A, S_B}, {mu_A, mu_B}, {sigma_A, sigma_B}, 'KNN');
 P_Error_KNN_2 = (N_A + N_B - sum(diag(KNN_confusion_mtx_AB)))/(N_A + N_B);

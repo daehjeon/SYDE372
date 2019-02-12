@@ -9,6 +9,13 @@
 % Class data
 % =================================================
 
+global ...
+N_A mu_A sigma_A ...
+N_B mu_B sigma_B ...
+N_C mu_C sigma_C ...
+N_D mu_D sigma_D ...
+N_E mu_E sigma_E;
+
 % Class A
 N_A = 200;
 mu_A = [5 10];
@@ -154,7 +161,7 @@ scatter(S_A(:, 1), S_A(:, 2));
 hold on;
 scatter(S_B(:, 1), S_B(:, 2));
 hold on;
-generateNN_db(1, {S_A, S_B});
+NN2_class = generateNN_db(1, {S_A, S_B});
 title("Nearest Neighbor Decision Boundary for Class A & B");
 
 %% KNN (K-Nearest Neighbor)
@@ -167,7 +174,7 @@ scatter(S_B(:, 1), S_B(:, 2));
 % hold on;
 % plot(C_B(:, 1), C_B(:, 2), 'LineWidth', 3);
 hold on;
-generateNN_db(5, {S_A, S_B});
+KNN2_class = generateNN_db(5, {S_A, S_B});
 title("K-Nearest Neighbor (k = 5) Decision Boundary for Class A & B");
 
 %% ///////////// CASE 2 (class C, D, & E) //////////////
@@ -259,7 +266,7 @@ scatter(S_D(:, 1), S_D(:, 2));
 hold on;
 scatter(S_E(:, 1), S_E(:, 2));
 hold on;
-generateNN_db(1, {S_C, S_D, S_E});
+KNN3_class = generateNN_db(1, {S_C, S_D, S_E});
 title("Nearest Neighbor Decision Boundary for Class C, D & E");
 %% 
 
@@ -271,7 +278,7 @@ scatter(S_D(:, 1), S_D(:, 2));
 hold on;
 scatter(S_E(:, 1), S_E(:, 2));
 hold on;
-generateNN_db(5, {S_C, S_D, S_E});
+KNN3_class = generateNN_db(5, {S_C, S_D, S_E});
 title("K-Nearest Neighbor (k = 5) Decision Boundary for Class C, D & E");
 
 
@@ -310,3 +317,13 @@ P_Error_Ged_2 = (N_A + N_B - sum(diag(GED_confusion_mtx_AB)))/(N_A + N_B);
 
 GED_confusion_mtx_CDE = confusion_matrix(3, {S_C, S_D, S_E}, {mu_C, mu_D, mu_E}, {sigma_C, sigma_D, sigma_E}, 'GED');
 P_Error_Ged_3 = (N_C + N_D + N_E - sum(diag(GED_confusion_mtx_CDE)))/(N_C + N_D + N_E);
+
+%% MAP error analysis
+
+[MAP_confusion_mtx_AB, P_Error_Map_2] = confusion_matrix(2, {S_A, S_B}, {mu_A, mu_B}, {sigma_A, sigma_B}, 'MAP', {P_A, P_B}, {N_A, N_B});
+% P_Error_Map_2 = (a_as_b + b_as_a)/(ClassA.N + ClassB.N);
+
+[MAP_confusion_mtx_CDE, P_Error_Map_3] = confusion_matrix(3, {S_C, S_D, S_E}, {mu_C, mu_D, mu_E}, {sigma_C, sigma_D, sigma_E}, 'MAP', {P_C, P_D, P_E}, {N_C, N_D, N_E});
+% P_Error_Map_3 = (c_as_d + c_as_e + d_as_c + d_as_e + ...
+%     e_as_c + e_as_d)/(ClassC.N + ClassD.N + ClassE.N);
+

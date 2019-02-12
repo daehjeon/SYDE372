@@ -161,7 +161,7 @@ scatter(S_A(:, 1), S_A(:, 2));
 hold on;
 scatter(S_B(:, 1), S_B(:, 2));
 hold on;
-NN2_class = generateNN_db(1, {S_A, S_B});
+generateNN_db(1, {S_A, S_B});
 title("Nearest Neighbor Decision Boundary for Class A & B");
 
 %% KNN (K-Nearest Neighbor)
@@ -174,7 +174,7 @@ scatter(S_B(:, 1), S_B(:, 2));
 % hold on;
 % plot(C_B(:, 1), C_B(:, 2), 'LineWidth', 3);
 hold on;
-KNN2_class = generateNN_db(5, {S_A, S_B});
+generateNN_db(5, {S_A, S_B});
 title("K-Nearest Neighbor (k = 5) Decision Boundary for Class A & B");
 
 %% ///////////// CASE 2 (class C, D, & E) //////////////
@@ -266,7 +266,7 @@ scatter(S_D(:, 1), S_D(:, 2));
 hold on;
 scatter(S_E(:, 1), S_E(:, 2));
 hold on;
-KNN3_class = generateNN_db(1, {S_C, S_D, S_E});
+generateNN_db(1, {S_C, S_D, S_E});
 title("Nearest Neighbor Decision Boundary for Class C, D & E");
 %% 
 
@@ -278,7 +278,7 @@ scatter(S_D(:, 1), S_D(:, 2));
 hold on;
 scatter(S_E(:, 1), S_E(:, 2));
 hold on;
-KNN3_class = generateNN_db(5, {S_C, S_D, S_E});
+generateNN_db(5, {S_C, S_D, S_E});
 title("K-Nearest Neighbor (k = 5) Decision Boundary for Class C, D & E");
 
 

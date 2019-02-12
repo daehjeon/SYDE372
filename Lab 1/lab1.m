@@ -9,6 +9,13 @@
 % Class data
 % =================================================
 
+global ...
+N_A mu_A sigma_A ...
+N_B mu_B sigma_B ...
+N_C mu_C sigma_C ...
+N_D mu_D sigma_D ...
+N_E mu_E sigma_E;
+
 % Class A
 N_A = 200;
 mu_A = [5 10];
@@ -311,11 +318,6 @@ P_Error_Ged_2 = (N_A + N_B - sum(diag(GED_confusion_mtx_AB)))/(N_A + N_B);
 GED_confusion_mtx_CDE = confusion_matrix(3, {S_C, S_D, S_E}, {mu_C, mu_D, mu_E}, {sigma_C, sigma_D, sigma_E}, 'GED');
 P_Error_Ged_3 = (N_C + N_D + N_E - sum(diag(GED_confusion_mtx_CDE)))/(N_C + N_D + N_E);
 
-
-%% MAP error analysis
-
-MAP_confusion_mtx_AB = confusion_matrix(2, {S_A, S_B}, {mu_A, mu_B}, {sigma_A, sigma_B}, 'MAP');
-
 %% NN/KNN error analysis
 
 NN_confusion_mtx_AB = confusion_matrix(2, {S_A, S_B}, {mu_A, mu_B}, {sigma_A, sigma_B}, '1NN');
@@ -329,3 +331,12 @@ P_Error_KNN_2 = (N_A + N_B - sum(diag(KNN_confusion_mtx_AB)))/(N_A + N_B);
 
 KNN_confusion_mtx_CDE = confusion_matrix(3, {S_C, S_D, S_E}, {mu_C, mu_D, mu_E}, {sigma_C, sigma_D, sigma_E}, 'KNN');
 P_Error_KNN_3 = (N_C + N_D + N_E - sum(diag(KNN_confusion_mtx_CDE)))/(N_C + N_D + N_E);
+
+%% MAP error analysis
+
+MAP_confusion_mtx_AB = confusion_matrix(2, {S_A, S_B}, {mu_A, mu_B}, {sigma_A, sigma_B}, 'MAP');
+% P_Error_Map_2 = (a_as_b + b_as_a)/(ClassA.N + ClassB.N);
+
+MAP_confusion_mtx_CDE = confusion_matrix(3, {S_C, S_D, S_E}, {mu_C, mu_D, mu_E}, {sigma_C, sigma_D, sigma_E}, 'MAP');
+% P_Error_Map_3 = (c_as_d + c_as_e + d_as_c + d_as_e + ...
+%     e_as_c + e_as_d)/(ClassC.N + ClassD.N + ClassE.N);
